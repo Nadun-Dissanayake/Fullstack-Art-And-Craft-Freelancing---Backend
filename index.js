@@ -21,7 +21,32 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-mongoose.connect('mongodb://localhost:27017/blogDB');
+// mongoose.connect('mongodb://localhost:27017/blogDB')
+// .then(() => {
+//     console.log('DB Connected');
+// }) .catch((err) => console.log('DB connection Error', err));
+
+
+// Environment Variables
+const PORT = 4000;
+const DB_URL= "mongodb+srv://blog:mern-blog@cluster0.zuuhrac.mongodb.net/?retryWrites=true&w=majority" || "mongodb://mongo:27017/blogDB"
+
+
+// Connect to MongoDB
+mongoose.connect(DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => {
+    console.log('DB Connected');
+})
+.catch((err) => console.log('DB connection Error', err));
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`App is running on port ${PORT}`);
+});
+
 
 app.post('/register', async (req,res) => {
     const {username, password, comformpassword} = req.body;
@@ -89,22 +114,47 @@ app.post('/product', uploadMiddleware.single('file') , async (req,res)=> {
         });
         res.json(productDoc);
     });
-
-    
 });
 
-// app.post('/message', async(err,info) =>{
-//     const {name,email,subject,message} = req.body;
-//     const messageDoc = await Message.create({ 
-//         name,
-//         email,
-//         subject,
-//         message,
-//         author : info.id,
-//     });
-//     res.json(messageDoc);
+
+// app.post('/message', async (req, res) => {
+//     // const { token } = req.cookies;
+
+//     // jwt.verify(token, secret, {}, async (err, info) => {
+//     //     if (err) {
+//     //         return res.status(401).json({ error: 'Unauthorized' });
+//     //     }
+
+//     //     const { name, email, subject, message } = req.body;
+
+//     //     try {
+//     //         const messageDoc = await Message.create({
+//     //             name,
+//     //             email,
+//     //             subject,
+//     //             message,
+//     //             author: info.id,
+//     //         });
+//     //         res.json(messageDoc);
+//     //     } catch (error) {
+//     //         res.status(500).json({ error: 'Internal Server Error' });
+//     //     }
+//     // });
+
+    
     
 // });
+
+app.post('/message', async(req,res) => {
+    const {name, email, subject, message} = req.body;
+    try{
+        const messageDoc = await Message.create({name, email, subject, message});
+        // res.status(200).json(message);
+        res.json(messageDoc);
+    } catch(e){
+        res.status(400).json(e);
+    }
+});
 
 app.put('/product', uploadMiddleware.single('file'), async (req,res) => {
     let newPath = null;
@@ -164,7 +214,6 @@ app.delete('/product/:id', async (req, res) => {
   });
 
 
-app.listen(4000);
 
 //mern-blog
 //blog

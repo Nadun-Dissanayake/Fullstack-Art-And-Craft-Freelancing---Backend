@@ -6,9 +6,6 @@ const MessageSchema = new Schema({
     email : String,
     subject : String,
     message : String,
-    author : {type:Schema.Types.ObjectId, ref:'User'},
-},{
-    timestamps: true,
 });
 
 const messageModel = model('Message' , MessageSchema);
